@@ -60,7 +60,10 @@ impl FileTree {
     }
 
     pub fn get_children(&self, path: &Path) -> Option<&[PathBuf]> {
-        unimplemented!()
+        match self.map.get(path){
+            Some(EntryNode::Directory { children })=> Some(children),
+            _=> None ,
+        }
     }
 
     pub fn get_size(&self, path: &Path) -> Option<Size> {
@@ -91,3 +94,4 @@ impl FileTree {
         unimplemented!()
     }
 }
+
