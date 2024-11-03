@@ -19,7 +19,8 @@ impl FileTree {
         let root_path=PathBuf::from(root);
         let mut map =HashMap::new();
 
-        Self::populate_map(&root_path,&mut map);
+        Self::populate_map(&root_path,&mut map)?;
+        Ok(FileTree { root:root_path, map })
     }
 
     fn populate_map(root :&PathBuf,map : &mut HashMap<PathBuf, EntryNode>)->std::io::Result<()>{
@@ -55,7 +56,7 @@ impl FileTree {
         Ok(())
     }
     pub fn get_root(&self) -> &Path {
-        unimplemented!()
+        &self.root
     }
 
     pub fn get_children(&self, path: &Path) -> Option<&[PathBuf]> {
@@ -63,7 +64,27 @@ impl FileTree {
     }
 
     pub fn get_size(&self, path: &Path) -> Option<Size> {
-        unimplemented!()
+        match self.map.get(path){
+            Some(node)=> match node{
+                EntryNode::File { size }=>Some(size.clone()),
+                EntryNode::Directory { children }=> {
+                    let total_size=children.iter().filter_map(|child|{
+                        match self.map.get(child){
+                            Some(child_node)=>match child_node{
+                                EntryNode::File {size} =>Some(size.to_bytes()),
+                                EntryNode::Directory {..}=>{
+                                    // Appel récursif pour les répertoires
+                                    self.get_size(child).map(|s| s.to_bytes())
+                                },
+                            },
+                            None=>None ,
+                        }
+                    }).sum();
+                    Some(Size::new(total_size))
+                }
+            },
+            None => None ,
+        }
     }
 
     pub fn files(&self) -> &[PathBuf] {
