@@ -7,6 +7,9 @@ impl Size {
     pub fn new(bytes: u64) -> Self {
         Self(bytes)
     }
+    pub fn to_bytes(&self)->u64{
+        self.0
+    }
 }
 
 impl fmt::Display for Size {
