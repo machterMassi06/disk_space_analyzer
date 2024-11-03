@@ -90,8 +90,22 @@ impl FileTree {
         }
     }
 
-    pub fn files(&self) -> &[PathBuf] {
-        unimplemented!()
+    pub fn files(&self) -> Vec<PathBuf> {
+        let mut files = Vec::new();
+        let mut stack = vec![self.root.clone()];
+        while let Some(current_path)=stack.pop(){
+            if let Some(node)=self.map.get(&current_path){
+                match node {
+                    EntryNode::File {..}=>files.push(current_path.clone()),
+                    EntryNode::Directory { children }=>{
+                        for child in children{
+                            stack.push(child.clone());
+                        }
+                    }
+                }
+            }
+        }
+        files
     }
 }
 
