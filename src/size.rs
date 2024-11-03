@@ -18,6 +18,6 @@ impl fmt::Display for Size {
 impl std::ops::Add for Size {
     type Output = Self;
     fn add(self, other: Self) -> Self::Output {
-        unimplemented!()
+        Self::new(self.0+other.0)
     }
 }
