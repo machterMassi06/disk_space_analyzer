@@ -21,3 +21,16 @@ impl std::ops::Add for Size {
         Self::new(self.0+other.0)
     }
 }
+
+
+#[cfg(test)]
+pub mod tests{
+    use super::*;
+    #[test]
+    fn test_add_size(){
+        let s1=Size::new(16);
+        let s2=Size::new(64);
+        let res = s1+s2;
+        assert_eq!(res.0,80);
+    }
+} 
