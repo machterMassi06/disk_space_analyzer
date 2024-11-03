@@ -9,7 +9,7 @@ pub struct FileTree {
 }
 // implementation de l'enum selon mes besoin 
 // peuvent etre soit des fichiers soit des repertoires 
-enum EntryNode {
+pub enum EntryNode {
     File {size : Size},
     Directory{children : Vec<PathBuf>},
 }
@@ -18,6 +18,8 @@ impl FileTree {
     pub fn new(root: &Path) -> std::io::Result<Self> {
         let root_path=PathBuf::from(root);
         let mut map =HashMap::new();
+        // Ajouter le répertoire racine
+        map.insert(root_path.clone(), EntryNode::Directory { children: Vec::new() });
 
         Self::populate_map(&root_path,&mut map)?;
         Ok(FileTree { root:root_path, map })
@@ -92,7 +94,7 @@ impl FileTree {
             None => None ,
         }
     }
-
+    /* 
     pub fn files(&self) -> Vec<PathBuf> {
         let mut files = Vec::new();
         let mut stack = vec![self.root.clone()];
@@ -110,6 +112,7 @@ impl FileTree {
         }
         files
     }
+    */
 }
 
 
