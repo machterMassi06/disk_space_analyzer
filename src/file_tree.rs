@@ -6,8 +6,12 @@ pub struct FileTree {
     root: PathBuf,
     map: HashMap<PathBuf, EntryNode>,
 }
-
-enum EntryNode {}
+// implementation de l'enum selon mes besoin 
+// peuvent etre soit des fichiers soit des repertoires 
+enum EntryNode {
+    File {size : Size},
+    Directory{children : Vec<PathBuf>},
+}
 
 impl FileTree {
     pub fn new(root: &Path) -> std::io::Result<Self> {
