@@ -1,5 +1,5 @@
 [package]
-name = "du"
+name = "Analyseur-espace-disque"
 version = "0.1.0"
 edition = "2021"
 
