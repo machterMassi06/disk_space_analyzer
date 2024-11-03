@@ -55,6 +55,9 @@ impl FileTree {
         } 
         Ok(())
     }
+    pub fn get_node(&self,path:&PathBuf)-> Option<&EntryNode>{
+        self.map.get(path)
+    }
     pub fn get_root(&self) -> &Path {
         &self.root
     }
