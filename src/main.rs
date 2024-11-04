@@ -20,6 +20,9 @@ enum Commands {
     Usage {
         /// (default '.')
         path: Option<PathBuf>,
+        /// Sort the tree in lexicographic order 
+        #[arg(long)]
+        lexicographic_sort :bool,
     },
 }
 
@@ -27,9 +30,9 @@ fn main() -> std::io::Result<()> {
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::Usage { path } => {
+        Commands::Usage { path,lexicographic_sort} => {
             let path = path.as_deref().unwrap_or(Path::new("."));
-            FileTree::new(path)?.show();
+            FileTree::new(path)?.show(*lexicographic_sort);
         }
     }
     Ok(())
