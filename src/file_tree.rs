@@ -94,7 +94,7 @@ impl FileTree {
             None => None ,
         }
     }
-    /* 
+    
     pub fn files(&self) -> Vec<PathBuf> {
         let mut files = Vec::new();
         let mut stack = vec![self.root.clone()];
@@ -112,7 +112,7 @@ impl FileTree {
         }
         files
     }
-    */
+    
 }
 
 
