@@ -23,6 +23,9 @@ enum Commands {
         /// Sort the tree in lexicographic order 
         #[arg(long)]
         lexicographic_sort :bool,
+        /// filter files by extentions (e.g.,.jpg)
+        #[arg(long,short)]
+        filter: Option<String>,
     },
 }
 
@@ -30,9 +33,9 @@ fn main() -> std::io::Result<()> {
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::Usage { path,lexicographic_sort} => {
+        Commands::Usage { path,lexicographic_sort,filter} => {
             let path = path.as_deref().unwrap_or(Path::new("."));
-            FileTree::new(path)?.show(*lexicographic_sort);
+            FileTree::new(path)?.show(*lexicographic_sort,filter.clone());
         }
     }
     Ok(())
