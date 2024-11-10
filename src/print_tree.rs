@@ -64,4 +64,20 @@ impl FileTree {
 
         }
     }
+    pub fn detect_duplicates(&self){
+        let duplicates = self.get_duplicate_files();
+        match duplicates.len(){
+            0=> println!("Aucun fichier dupliqué trouvé."),
+            _ => {
+                println!("Fichiers dupliqués détectés :");
+                for group in duplicates{
+                    println!("--- Groupe de fichiers dupliqués ---");
+                    for file in group{
+                        println!("{}",file.display());
+                    }
+                    println!();
+                }
+            }
+        }
+    }
 }
