@@ -16,6 +16,11 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// show duplicates files  
+    Duplicates{
+        /// Path to analyze for duplicates
+        path:PathBuf,
+    } ,
     /// Show the disk usage tree for the given path
     Usage {
         /// (default '.')
@@ -36,6 +41,9 @@ fn main() -> std::io::Result<()> {
         Commands::Usage { path,lexicographic_sort,filter} => {
             let path = path.as_deref().unwrap_or(Path::new("."));
             FileTree::new(path)?.show(*lexicographic_sort,filter.clone());
+        },
+        Commands::Duplicates { path }=>{
+            FileTree::new(path)?.detect_duplicates();
         }
     }
     Ok(())
