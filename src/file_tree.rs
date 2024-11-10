@@ -1,7 +1,10 @@
 use crate::size::Size;
 use std::collections::HashMap;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::fs;
+use std::io;
+use sha2::{Sha256, Digest};// Importation SHA256 hashage 
 
 pub struct FileTree {
     root: PathBuf,
@@ -112,7 +115,22 @@ impl FileTree {
         }
         files
     }
-    
+    pub fn get_duplicate_files(&self)->Vec<PathBuf>{
+        unimplemented!()
+    }
+    fn calc_hash(path:&PathBuf)->io::Result<String>{
+        let mut file = fs::File::open(path)?;
+        let mut hasher=Sha256::new();
+        let mut buffer=[0u8;4096];
+        loop{
+            let bytes=file.read(&mut buffer)?;
+            if bytes==0{
+                break;
+            }
+            hasher.update(&buffer[..bytes]);
+        }
+        Ok(format!("{:x}", hasher.finalize()))
+    }
 }
 
 
