@@ -115,8 +115,18 @@ impl FileTree {
         }
         files
     }
-    pub fn get_duplicate_files(&self)->Vec<PathBuf>{
-        unimplemented!()
+    pub fn get_duplicate_files(&self)->Vec<Vec<PathBuf>>{
+        let mut hash_map:HashMap<String,Vec<PathBuf>>=HashMap::new();
+        // Parcourir tous les fichiers de l'arborescence
+        let files = self.files();
+        for file in files {
+            // Calculer la signature SHA256 pour le contenu du fichier
+            if let Ok(hash)=Self::calc_hash(&file){
+                hash_map.entry(hash).or_default().push(file);
+            }
+        }
+        // Retourner uniquement les groupes de fichiers qui ont des doublons
+        hash_map.into_values().filter(|group| group.len()>1).collect()
     }
     fn calc_hash(path:&PathBuf)->io::Result<String>{
         let mut file = fs::File::open(path)?;
