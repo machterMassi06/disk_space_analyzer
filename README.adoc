@@ -111,8 +111,7 @@ La taille d'un répertoire est la taille totale de tous les fichiers et sous-ré
 
 === Affichage de l'arbre === 
 
-Vous pouvez désormais écrire le code qui affichera l'arbre sur le terminal. De manière à découpler le programme, la méthode d'affichage, `pub fn show(&self)`, sera implémentée dans le fichier `print_tree.rs`. Vous êtes libres d'optimiser l'ergonomie et l'esthétique de l'affichage comme bon vous semble. Veillez cependant à faire apparaitre la structure hiérarchique, à afficher pour chaque nœud de l'arbre sa taille (de manière lisible par l'humain).
-
+l'affichage l'arbre sur le terminal se fait de manière à découpler le programme, la méthode d'affichage, `pub fn show(&self)`, qui est implémentée dans le fichier `print_tree.rs`. 
 
 === Tri et filtrage ===
 
