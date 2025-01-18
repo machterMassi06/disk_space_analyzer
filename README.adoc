@@ -1,34 +1,26 @@
 = Analyseur d'espace disque 
 Stéphane Lopes <stephane.lopes@uvsq.fr>, Pablo de Oliveira Castro <pablo.oliveira@uvsq.fr>, Yann Strozecki <yann.strozecki@uvsq.fr>
 v2023-2024
-:stem:
-:icons: font
-:experimental:
-:source-highlighter: highlightjs
-:imagesdir: figs/
 
-L'objectif de ce mini-projet est de créer une application en ligne de commande
-pour analyser l'utilisation de l'espace disque. Ce projet se compose de trois parties:
+Ce projet consiste à développer une application en ligne de commande pour analyser l'utilisation de l'espace disque. Il est divisé en **deux parties principales** :
 
-* Dans la première partie, vous développerez un analyseur d'utilisation de l'espace disque: on fera un parcours récursif d'un chemin donné en calculant la taille de chaque fichier et sous-répertoire rencontré. Cela nous permettra d'afficher un «arbre» de fichiers et d'associer à chaque nœud sa taille.
+1. **Analyseur d'utilisation de l'espace disque**  
+   Cette partie effectue un **parcours récursif** d'un chemin donné, calcule la taille de chaque fichier et sous-répertoire rencontré, et génère un **arbre hiérarchique** des fichiers avec leur taille associée.
 
-* Dans la deuxième partie, vous développerez un outil pour identifier les éventuels fichiers dupliqués au sein de l'arbre de fichiers.
+2. **Détection de fichiers dupliqués**  
+   Cette fonctionnalité identifie les fichiers dupliqués au sein de l'arbre de fichiers en utilisant des signatures uniques générées via des fonctions de hachage.
 
-* Dans la troisième et dernière partie, nous vous proposerons différentes pistes pour améliorer votre projet et aller plus loin.
 
-Ce sujet est volontairement peu contraignant afin de vous laisser proposer vos propres évolutions. Vous n'êtes pas limités à l'utilisation de la bibliothèque standard et vous êtes libres d'utiliser d'autres _crates_.
 
-[CAUTION]
+
+[NOTE]
 ====
 * Le projet initial est géré avec `cargo` et est structuré en plusieurs modules et fichiers.
-* Pensez à valider régulièrement votre travail avec `git`.
-* Respectez le https://doc.rust-lang.org/1.0.0/style/[guide de style] Rust dans votre code source.
-* Documentez votre code conformément aux recommandations et ajoutez des tests unitaires.
 ====
 
 == Partie I : Analyseur de disque ==
 
-L'interface en ligne de commande est facilitée par la bibliothèque https://docs.rs/clap/latest/clap/[clap]. Un code minimal utilisant clap est fourni dans `src/main.rs`.
+L'interface en ligne de commande est facilitée par la bibliothèque https://docs.rs/clap/latest/clap/[clap].
 
 Clap permet la gestion de sous-commandes sur le terminal. Par exemple la sous-commande `help` affichera la liste des sous-commandes disponibles.
 
@@ -45,7 +37,7 @@ Options:
   -V, --version  Print version
 ```
 
-Pour lancer l'analyseur de disque vous utiliserez la sous-commande 'usage', qui prends comme argument le sous-répertoire à analyser. Par exemple, pour analyser le répertoire courant "." vous écrirez sur le terminal :
+Pour lancer l'analyseur de disque ,avec la sous-commande 'usage', qui prends comme argument le sous-répertoire à analyser. Par exemple, pour analyser le répertoire courant "." vous écrirez sur le terminal :
 
 ```sh
 cargo run -- usage .
@@ -83,22 +75,17 @@ $ cargo run -- usage "/Music/Dead Can Dance"
 
 === Implémentation d'un type Size ===
 
-Nous allons commencer par implémenter une classe `Size` pour gérer les tailles des fichiers. Le fichier `size.rs` donne un squelette de cette classe.
+La classe `Size` sert a gérer les tailles des fichiers.
 Size permet de stocker une taille en octets.
 
-* Étudiez le constructeur `Size::new(bytes: u64) -> Self` qui permet d'initialiser un objet size de taille `bytes: u64`.
-* Implémentez le trait `std::ops::Add` pour la classe Size, de manière à pouvoir additionner deux objects de type `Size`.
-* Modifiez l'implémentation du trait `fmt::Display` de manière à afficher la taille dans un format compréhensible par un humain. Par exemple, pour `Size(1024)` vous afficherez `1KiB`, pour `Size(2411724)` vous afficherez `2.3MiB`.
+* Implémentation du constructeur `Size::new(bytes: u64) -> Self` qui permet d'initialiser un objet size de taille `bytes: u64`.
+* Implémentation du trait `std::ops::Add` pour la classe Size, de manière à pouvoir additionner deux objects de type `Size`.
+* Modification de l'implémentation du trait `fmt::Display` de manière à afficher la taille dans un format compréhensible par un humain. Par exemple, pour `Size(1024)` => `1KiB`, et pour `Size(2411724)` => `2.3MiB`.
 
-[CAUTION]
-====
-Vérifiez que votre classe Size fonctionne correctement en rajoutant des tests unitaires dans le fichier `size.rs`.
-====
 
 === Implémentation de l'arbre de fichiers ===
 
-Ici nous allons implémenter la classe permettant de représenter un arbre de fichiers.
-Un squelette est fourni dans le fichier `file_tree.rs`.
+Ici est une classe permettant de représenter un arbre de fichiers.
 
 La structure `FileTree` représentera un arbre de fichiers. L'arbre est composé de répertoires et de fichiers. Chaque nœud de l'arbre sera identifié par son chemin sur le disque.
 `FileTree` possède deux champs:
@@ -106,15 +93,10 @@ La structure `FileTree` représentera un arbre de fichiers. L'arbre est composé
 * `root` donne le nom du répertoire racine de l'arbre.
 * `map` est une https://doc.rust-lang.org/stable/std/collections/struct.HashMap.html[table de hachage] qui associe à chaque nœud (identifié par son chemin) un objet `EntryNode`.
 
-L'objet `EntryNode` capturera les informations d'un fichier ou d'un sous-répertoire. Pour les fichiers, elle devra au minimum contenir la taille du fichier. Pour les répertoires, elle devra au minimum contenir une liste des « enfants » du répertoire, c'est à dire, une liste des chemins des fichiers et sous-répertoires immédiatement contenus par ce répertoire. Dans le squelette on vous propose d'utiliser un `enum` pour représenter `EntryNode`; néanmoins le choix est libre.
+L'objet `EntryNode` capturera les informations d'un fichier ou d'un sous-répertoire. Pour les fichiers, elle contient la taille du fichier. Pour les répertoires, elle devra contenir une liste des « enfants » du répertoire, c'est à dire, une liste des chemins des fichiers et sous-répertoires immédiatement contenus par ce répertoire.
 
-[TIP]
-====
-* Vous êtes libres de modifier `EntryNode` et `FileTree` selon les besoins de votre projet.
-* Pour parcourir les répertoires et fichiers sur votre disque vous pouvez utiliser la fonction https://doc.rust-lang.org/std/fs/fn.read_dir.html[std::fs::read_dir].
-====
 
-Un certain nombre de méthodes publiques associées à `FileTree` doivent être implémentées,
+Un certain nombre de méthodes publiques associées à `FileTree` implémentées:
 
 * `pub fn new(root: &Path) -> std::io::Result<FileTree>` est un constructeur qui retourne l'arbre de fichiers pour le chemin racine `root`.
 * `pub fn get_root(&self) -> &Path` renvoie le chemin racine de l'arbre.
@@ -122,7 +104,7 @@ Un certain nombre de méthodes publiques associées à `FileTree` doivent être 
 * `pub fn get_children(&self, index: &Path) -> Option<&[PathBuf]>` renvoie une tranche contenant les enfants d'un chemin (uniquement si ce chemin est trouvé dans l'arbre).
 * `pub fn files(&self) -> Vec<PathBuf>` renvoie un vecteur contenant tous les fichiers (et uniquement les fichiers) de l'arbre.
 
-[CAUTION]
+[NOTE]
 ====
 La taille d'un répertoire est la taille totale de tous les fichiers et sous-répertoires qu'il contient de manière récursive.
 ====
@@ -131,45 +113,24 @@ La taille d'un répertoire est la taille totale de tous les fichiers et sous-ré
 
 Vous pouvez désormais écrire le code qui affichera l'arbre sur le terminal. De manière à découpler le programme, la méthode d'affichage, `pub fn show(&self)`, sera implémentée dans le fichier `print_tree.rs`. Vous êtes libres d'optimiser l'ergonomie et l'esthétique de l'affichage comme bon vous semble. Veillez cependant à faire apparaitre la structure hiérarchique, à afficher pour chaque nœud de l'arbre sa taille (de manière lisible par l'humain).
 
-[TIP]
-====
-Il est tout à fait possible de rajouter des fonctions associées depuis un autre module, néanmoins cela vous force à n'utiliser que les méthodes publiques définies pour FileTree, ce qui a l'avantage d'aboutir à une conception de code encapsulé et découplé.
-====
-
 
 === Tri et filtrage ===
 
-* Modifiez le code précédent pour trier les nœuds à chaque niveau de l'arbre par taille décroissante.
-* Rajoutez une option dans clap (`--lexicographic-sort`) permettant au contraire de trier l'arbre selon l'ordre lexicographique des chemins.
-* Rajoutez une option dans clap (`--filter .jpg`) pour filtrer les nœuds de l'arbre. Par exemple `--filter .jpg` affichera: les fichiers terminant par `.jpg` et tous les répertoires qui contiennent un fichier de ce type (même par transitivité).
+* Trier les nœuds à chaque niveau de l'arbre par taille décroissante.
+* Trier l'arbre selon l'ordre lexicographique des chemins (Une option dans clap (`--lexicographic-sort`)).
+* Ajout d'une option dans clap (`--filter .jpg`) pour filtrer les nœuds de l'arbre. Par exemple `--filter .jpg` affichera: les fichiers terminant par `.jpg` et tous les répertoires qui contiennent un fichier de ce type (même par transitivité).
 
 == Partie II : Détecteur de doublons ==
 
-Cette deuxième partie sera moins guidée. Il s'agit d'implémenter un détecteur de doublons qui sera invoqué avec la sous-commande clap `cargo run -- duplicates PATH` où `PATH` est le chemin racine. Cette commande trouvera tous les fichiers dupliqués au sein de `PATH` et affichera les doublons détéctés.
+Il s'agit d'une implémentation d'un détecteur de doublons qui sera invoqué avec la sous-commande clap `cargo run -- duplicates PATH` où `PATH` est le chemin racine. Cette commande trouvera tous les fichiers dupliqués au sein de `PATH` et affichera les doublons détéctés.
 
-Comparer tous les fichiers deux à deux a un coût prohibitif. Nous vous proposons donc la méthode suivante:
+Ici , on compare tous les fichiers deux à deux a un coût prohibitif avec la méthode suivante:
 
 * Génerer l'arbre de fichiers correspondant à la racine `PATH`.
-* Pour chacun des fichiers de l'arbre, calculer une signature (presque toujours unique) à l'aide d'une fonction de hachage. Vous pouvez par exemple utiliser des fonctions cryptographiques comme MD5, SHA1, ou SHA256.
+* Pour chacun des fichiers de l'arbre, calculer une signature à l'aide d'une fonction cryptographique (hachage) 'SHA256'.
 * Parcourir les signatures générées et retrouver les doublons.
 
-Implémentez la sous-commande clap, la méthode de détection ci-dessus, ainsi qu'une fonction d'affichage permettant à l'utilisateur de rapidement identifier les fichiers doublons.
 
-[CAUTION]
-====
-La conception et l'organisation du code dans cette partie sont libres. Essayez néanmoins de générer un code découplé !
-====
+== Inspiration du Projet ==
+Ce projet s'inspire du sujet du Projet 23/24 proposé dans le cadre du cours Programmation Efficace de l'Université de Versailles Saint-Quentin-en-Yvelines (UVSQ). J'ai choisi ce sujet pour approfondir mes compétences en Rust tout en appliquant les concepts étudiés en cours à un cas concret et pratique.
 
-== Partie III: Pour aller plus loin
-
-Maintenant vous avez un premier prototype fonctionnel. Nous vous proposons plusieurs pistes pour aller plus loin. En fonction du temps qu'il vous reste et de vos envies, vous pouvez en explorer une ou plusieurs.
-
-* _Tests unitaire et documentation_ : avez-vous écrit des tests unitaires et documenté votre code à chaque étape d'implémentation ? Si ce n'est pas le cas, prennez le temps de le faire maintenant.
-
-* _Itérateur pour_ `FileTree` : implémentez le trait https://doc.rust-lang.org/std/iter/trait.Iterator.html[`Iterator`] pour la classe `FileTree`. Modifiez la fonction associée `pub fn files(&self)` de manière à ce qu'elle retourne un itérateur plutôt qu'un vecteur. Quels avantages voyez vous à l'utilisation d'un itérateur dans ce cas ?
-
-* _Collisions_ : les fonctions cryptographiques utilisées dans la partie II ont un risque (faible) de collision, ce qui pourrait lever des faux-positifs lors de la recherche de doublons. Ajoutez une option clap `--check-for-collisions` pour résoudre ce problème.
-
-* _Interface_ `ratatui` : utilisez la bibliothèque  https://github.com/ratatui-org/ratatui[`ratatui`] pour proposer une interface évoluée dans le terminal.
-
-* _Parallélisation_ : dans la partie II le calcul des signatures de hachage pour chaque fichier est long; est-il possible de paralléliser cette partie pour accélérer votre programme ?
