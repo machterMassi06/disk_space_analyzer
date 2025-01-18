@@ -15,7 +15,7 @@ Ce projet consiste à développer une application en ligne de commande pour anal
 
 [NOTE]
 ====
-* Le projet initial est géré avec `cargo` et est structuré en plusieurs modules et fichiers.
+* Le projet est géré avec `cargo` et est structuré en plusieurs modules et fichiers.
 ====
 
 == Partie I : Analyseur de disque ==
